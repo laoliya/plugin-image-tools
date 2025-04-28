@@ -15,8 +15,6 @@ export default function ImageTools(options:  Partial<PluginOptions> = {}): Plugi
     config(config: UserConfig, env: { command: string }) {
       //config 获取vite配置项
       isBuild = env.command === "build"; //确定环境
-      //   console.log(9999, config);
-      //   console.log(10000, env);
     },
     configureServer(server: ViteDevServer) {
       server.middlewares.use(
@@ -25,12 +23,10 @@ export default function ImageTools(options:  Partial<PluginOptions> = {}): Plugi
           res: http.ServerResponse,
           next: Function
         ) => {
-          // console.log("req", req.url);
           if (!filterImage(req.url || "")) {
             //如果不是图片类型的则直接返回
             return next();
           }
-          // console.log("req.url",req.url);
           try {
             const filePath = decodeURIComponent(
               path.resolve(process.cwd(), req.url?.split("?")[0].slice(1) || "")

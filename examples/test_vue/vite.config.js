@@ -17,7 +17,7 @@ export default defineConfig({
   plugins: [
     vue(),
     ImageTools({
-      A:111
+      enableDevWebp: true,
     })
   ]
 })
