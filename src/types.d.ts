@@ -1,3 +1,16 @@
+import type {
+  FormatEnum,
+  WebpOptions,
+  PngOptions,
+  Jp2Options,
+  JpegOptions,
+  JxlOptions,
+  AvifOptions,
+  TiffOptions,
+  GifOptions,
+  OutputOptions
+} from 'sharp'
+
 interface sharpConfigType {
   jpeg?: JpegOptions;
   jpg?: JpegOptions;
@@ -14,7 +27,7 @@ export type PluginOptions = {
   enableWebp: boolean;
   include: string[];
   cacheDir: string;
-  // sharpConfig: sharpConfigType
+  sharpConfig: sharpConfigType
 };
 
 export type ImgFormatType = keyof sharpConfigType;

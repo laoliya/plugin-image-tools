@@ -18,6 +18,15 @@ export default defineConfig({
     vue(),
     ImageTools({
       enableDevWebp: true,
+      enableDev: true,
+      sharpConfig: {
+        jpg: {
+          quality: 10
+        },
+        png: {
+          quality: 70
+        }
+      }
     })
   ]
 })
