@@ -4,9 +4,14 @@ import type { PluginOptions } from "./types";
 import * as http from "node:http";
 import path, { join, parse } from "path";
 import { filterImage } from "./utils.ts";
-import { getGlobalConfig, setGlobalConfig } from "./cache";
+import {
+  getGlobalConfig,
+  setGlobalConfig,
+  handleImgMap,
+  handleReplaceWebp,
+} from "./cache";
 import { IMG_FORMATS_ENUM } from "./constants";
-import { processImage } from "./press";
+import { processImage, handleImgBundle } from "./press";
 export default function ImageTools(
   options: Partial<PluginOptions> = {}
 ): Plugin {
@@ -24,10 +29,11 @@ export default function ImageTools(
       //config 获取vite配置项
       isBuild = env.command === "build"; //确定环境
     },
-    configureServer(server: ViteDevServer) {  //vite开发服务器触发
+    configureServer(server: ViteDevServer) {
+      //vite开发服务器触发
       if (!enableDev) return;
       server.middlewares.use(
-       async (
+        async (
           req: http.IncomingMessage,
           res: http.ServerResponse,
           next: Function
@@ -38,7 +44,7 @@ export default function ImageTools(
           }
           try {
             const filePath = decodeURIComponent(
-              path.resolve( process.cwd(), req.url?.split("?")[0].slice(1) || "")
+              path.resolve(process.cwd(), req.url?.split("?")[0].slice(1) || "")
             ); //获取到绝对路径地址
             if (!filterImage(filePath)) {
               //如果不是图片类型的则直接返回
@@ -59,6 +65,24 @@ export default function ImageTools(
           }
         }
       );
+    },
+    async generateBundle(_options, bundle) {
+      if (!isBuild) return;
+      handleImgMap(bundle);
+      await handleImgBundle(bundle);
+    },
+    async writeBundle(opt, bundle) {
+      const { enableWebp } = getGlobalConfig();
+      if (!enableWebp) {
+        return;
+      }
+      for (const key in bundle) {
+        const chunk = bundle[key] as any;
+        if (/(html)$/.test(key)) {
+          const htmlCode = handleReplaceWebp(chunk.source) //替换代码中的文件名
+          writeFileSync(join(opt.dir!, chunk.fileName), htmlCode) //写入文件
+        }
+      }
     },
   };
 }

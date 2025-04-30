@@ -18,6 +18,7 @@ export default defineConfig({
     vue(),
     ImageTools({
       enableDevWebp: true,
+      enableWebp: true,
       enableDev: true,
       sharpConfig: {
         jpg: {
